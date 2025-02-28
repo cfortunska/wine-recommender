@@ -1,0 +1,7 @@
+voila
+ipywidgets
+pandas
+notebook
+sklearn
+numpy
+rapidfuzz
