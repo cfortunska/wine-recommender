@@ -2,6 +2,6 @@ voila
 ipywidgets
 pandas
 notebook
-sklearn
+scikit-learn
 numpy
 rapidfuzz
