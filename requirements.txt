@@ -1,7 +1,6 @@
-voila
-ipywidgets
+streamlit
 pandas
-notebook
 scikit-learn
 numpy
-rapidfuzz
+fuzzywizzy
+python-Levenshtein
