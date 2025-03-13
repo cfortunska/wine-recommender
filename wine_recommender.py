@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 # Load Data
-file = "https://drive.google.com/file/d/13_2Y30Xz6AXgaemW70-UL6r5DBzlaZDD/view?usp=drive_link"
+file = "url = "https://drive.google.com/uc?export=download&id=13_2Y30Xz6AXgaemW70-UL6r5DBzlaZDD"
 df1 = pd.read_csv(file)
 
 # Build Recommendation System
