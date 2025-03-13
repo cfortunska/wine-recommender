@@ -55,9 +55,11 @@ def recommend(title):
     return df1.iloc[wine_indices][["title", "price", "country", "points", "province", "variety"]]
 
 # Streamlit UI
+# Streamlit UI
 st.title("🍷 Wine Recommender")
 
-user_input = st.text_input("Enter a wine name:")
+# Text input with dynamic updates
+user_input = st.text_input("Enter a wine name:", key="user_input")
 
 if user_input:
     matched_item = search_item(user_input, df1["title"].tolist())
