@@ -8,7 +8,6 @@ import requests
 from io import StringIO
 
 # Function to load data from Google Drive
-@st.cache_data
 def load_data(file_url):
     try:
         response = requests.get(file_url)
