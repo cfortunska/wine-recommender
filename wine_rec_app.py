@@ -1,4 +1,3 @@
-# Imports
 import pandas as pd
 import streamlit as st
 from fuzzywuzzy import process
@@ -8,6 +7,7 @@ import requests
 from io import StringIO
 
 # Function to load data from Google Drive
+@st.cache_data
 def load_data(file_url):
     try:
         response = requests.get(file_url)
@@ -22,7 +22,6 @@ def load_data(file_url):
 # Load Data
 file_url = "https://drive.google.com/uc?export=download&id=1a9W-WfQTfe1XS5Kw7rDmQjllaOs9PCLy"
 df1 = load_data(file_url)
-
 if df1.empty:
     st.error("Failed to load data. Please check the file URL or file accessibility.")
     st.stop()
@@ -39,8 +38,9 @@ cosine_sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 # Function to search for best match
 def search_item(user_input, choices, threshold=80):
-    best_match = process.extractOne(user_input, choices)
-    return best_match[0] if best_match and best_match[1] >= threshold else None
+    matches = process.extract(user_input, choices, limit=5)  # Limit to 5 suggestions
+    filtered_matches = [match[0] for match in matches if match[1] >= threshold]  # Only keep matches above threshold
+    return filtered_matches
 
 # Function to recommend wines
 def recommend(title):
@@ -57,18 +57,20 @@ def recommend(title):
 # Streamlit UI
 st.title("🍷 Wine Recommender")
 
+# Handle user input dynamically using session state
+if 'user_input' not in st.session_state:
+    st.session_state.user_input = ""
+
 # Text input with dynamic updates
-user_input = st.text_input("Enter a wine name:")
+user_input = st.text_input("Enter a wine name:", value=st.session_state.user_input)
 
-# Function to filter titles based on user input and search for matches
-def dynamic_search(user_input, choices, threshold=80):
-    matches = process.extract(user_input, choices, limit=5)  # Limit to 5 suggestions
-    filtered_matches = [match[0] for match in matches if match[1] >= threshold]  # Only keep matches above threshold
-    return filtered_matches
+# Update session state when the user types
+if user_input != st.session_state.user_input:
+    st.session_state.user_input = user_input
 
-# Display the suggestions as the user types
-if user_input:
-    matched_items = dynamic_search(user_input, df1["title"].tolist())
+# Only trigger search when user has input
+if st.session_state.user_input:
+    matched_items = search_item(st.session_state.user_input, df1["title"].tolist())
 
     if matched_items:
         st.write(f"Showing results for: {', '.join(matched_items)}")
