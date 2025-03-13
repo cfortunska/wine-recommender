@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-from fuzzywuzzy import process
 import requests
 from io import StringIO
 
@@ -29,28 +28,23 @@ if "title" not in df1.columns:
     st.error("The dataset must contain a 'title' column.")
     st.stop()
 
-# Function to search for best match using fuzzywuzzy
-def search_item(user_input, choices, threshold=80):
-    matches = process.extract(user_input, choices, limit=5)  # Limit to 5 suggestions
-    filtered_matches = [match[0] for match in matches if match[1] >= threshold]  # Only keep matches above threshold
-    return filtered_matches
-
 # Streamlit UI
 st.title("🍷 Wine Recommender")
 
-# Text input with dynamic updates
+# Text input to type a wine name
 user_input = st.text_input("Enter a wine name:")
 
+# Filter wines based on the user input
 if user_input:
-    matched_items = search_item(user_input, df1["title"].tolist())
+    filtered_titles = df1[df1["title"].str.contains(user_input, case=False, na=False)]["title"].tolist()
 
-    if matched_items:
-        # Show suggestions dynamically in a selectbox
-        selected_item = st.selectbox("Select a wine from the suggestions:", matched_items)
+    if filtered_titles:
+        # Display matching titles in a selectbox
+        selected_item = st.selectbox("Select a wine from the suggestions:", filtered_titles)
 
         if selected_item:
             st.write(f"Showing results for: **{selected_item}**")
-            # Here, you can add your wine recommendation functionality for the selected item
+            # You can add recommendation logic for the selected item here
             st.write("Display recommendations for the selected wine here.")
     else:
         st.warning("No close match found. Try another search.")
