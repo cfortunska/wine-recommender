@@ -72,12 +72,13 @@ if user_input != st.session_state.user_input:
 if st.session_state.user_input:
     matched_items = search_item(st.session_state.user_input, df1["title"].tolist())
 
+    # Display a selectbox with suggestions based on matched items
     if matched_items:
-        st.write(f"Showing results for: {', '.join(matched_items)}")
-        
-        # Show detailed recommendations for each matched item
-        for item in matched_items:
-            recommendations = recommend(item)
+        selected_item = st.selectbox("Select a wine from the suggestions:", matched_items)
+
+        if selected_item:
+            st.write(f"Showing results for: **{selected_item}**")
+            recommendations = recommend(selected_item)
 
             if not recommendations.empty:
                 for _, row in recommendations.iterrows():
@@ -88,6 +89,6 @@ if st.session_state.user_input:
                                 f"**Province:** {row['province']}  \n"
                                 f"**Variety:** {row['variety']}")
             else:
-                st.warning(f"No similar wines found for **{item}**.")
+                st.warning(f"No similar wines found for **{selected_item}**.")
     else:
         st.warning("No close match found. Try another search.")
