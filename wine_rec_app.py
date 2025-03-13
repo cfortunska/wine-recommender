@@ -20,7 +20,7 @@ def load_data(file_url):
         return pd.DataFrame()  # Return empty DataFrame if loading fails
 
 # Load Data
-file_url = "https://drive.google.com/uc?export=download&id=13_2Y30Xz6AXgaemW70-UL6r5DBzlaZDD"
+file_url = "https://drive.google.com/uc?export=download&id=1a9W-WfQTfe1XS5Kw7rDmQjllaOs9PCLy"
 df1 = load_data(file_url)
 
 if df1.empty:
