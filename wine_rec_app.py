@@ -55,28 +55,37 @@ def recommend(title):
     return df1.iloc[wine_indices][["title", "price", "country", "points", "province", "variety"]]
 
 # Streamlit UI
-# Streamlit UI
 st.title("🍷 Wine Recommender")
 
 # Text input with dynamic updates
-user_input = st.text_input("Enter a wine name:", key="user_input")
+user_input = st.text_input("Enter a wine name:")
 
+# Function to filter titles based on user input and search for matches
+def dynamic_search(user_input, choices, threshold=80):
+    matches = process.extract(user_input, choices, limit=5)  # Limit to 5 suggestions
+    filtered_matches = [match[0] for match in matches if match[1] >= threshold]  # Only keep matches above threshold
+    return filtered_matches
+
+# Display the suggestions as the user types
 if user_input:
-    matched_item = search_item(user_input, df1["title"].tolist())
+    matched_items = dynamic_search(user_input, df1["title"].tolist())
 
-    if matched_item:
-        st.write(f"Showing results for: **{matched_item}**")
-        recommendations = recommend(matched_item)
+    if matched_items:
+        st.write(f"Showing results for: {', '.join(matched_items)}")
+        
+        # Show detailed recommendations for each matched item
+        for item in matched_items:
+            recommendations = recommend(item)
 
-        if not recommendations.empty:
-            for _, row in recommendations.iterrows():
-                st.markdown(f"**{row['title']}**  \n"
-                            f"**Price:** ${row['price']}  \n"
-                            f"**Country:** {row['country']}  \n"
-                            f"**Points:** {row['points']}  \n"
-                            f"**Province:** {row['province']}  \n"
-                            f"**Variety:** {row['variety']}")
-        else:
-            st.warning("No similar wines found.")
+            if not recommendations.empty:
+                for _, row in recommendations.iterrows():
+                    st.markdown(f"**{row['title']}**  \n"
+                                f"**Price:** ${row['price']}  \n"
+                                f"**Country:** {row['country']}  \n"
+                                f"**Points:** {row['points']}  \n"
+                                f"**Province:** {row['province']}  \n"
+                                f"**Variety:** {row['variety']}")
+            else:
+                st.warning(f"No similar wines found for **{item}**.")
     else:
         st.warning("No close match found. Try another search.")
