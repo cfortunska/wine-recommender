@@ -72,8 +72,8 @@ if user_input != st.session_state.user_input:
 if st.session_state.user_input:
     matched_items = search_item(st.session_state.user_input, df1["title"].tolist())
 
-    # Display a selectbox with suggestions based on matched items
     if matched_items:
+        # Show suggestions dynamically in a selectbox
         selected_item = st.selectbox("Select a wine from the suggestions:", matched_items)
 
         if selected_item:
