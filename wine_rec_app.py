@@ -1,18 +1,43 @@
 # Imports
 import pandas as pd
 import streamlit as st
+import pickle
+import os
 from fuzzywuzzy import process
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-# Load data
-file='https://raw.githubusercontent.com/cfortunska/wine-recommender/main/wine_final.csv'
-df1=pd.read_csv(file)
+# Define file paths for saved models
+TFIDF_PATH = 'tfidf_matrix.pkl'
+COSINE_SIM_PATH = 'cosine_sim_matrix.pkl'
 
-# Build Recommendation System
-tfidf = TfidfVectorizer(stop_words='english')
-tfidf_matrix = tfidf.fit_transform(df1['new_description'].fillna(''))  # Fill NaN descriptions with empty strings
-cosine_sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
+# Load data
+file = 'https://raw.githubusercontent.com/cfortunska/wine-recommender/main/wine_final.csv'
+df1 = pd.read_csv(file)
+
+# Check if pre-computed matrices exist
+if os.path.exists(TFIDF_PATH) and os.path.exists(COSINE_SIM_PATH):
+    with open(TFIDF_PATH, 'rb') as f:
+        tfidf_matrix = pickle.load(f)
+
+    with open(COSINE_SIM_PATH, 'rb') as f:
+        cosine_sim_matrix = pickle.load(f)
+    st.write("✅ Loaded pre-computed matrices successfully.")
+else:
+    # If not, compute and save them
+    st.write("⏳ Computing similarity matrix. This may take a while...")
+    tfidf = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = tfidf.fit_transform(df1['new_description'].fillna(''))
+    cosine_sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
+    
+    # Save the matrices to disk
+    with open(TFIDF_PATH, 'wb') as f:
+        pickle.dump(tfidf_matrix, f)
+
+    with open(COSINE_SIM_PATH, 'wb') as f:
+        pickle.dump(cosine_sim_matrix, f)
+    
+    st.write("✅ Computation complete and models saved successfully.")
 
 # Function to search for best match
 def search_item(user_input, choices, threshold=80):
