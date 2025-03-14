@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 # Define file paths for saved models
-TFIDF_PATH = 'tfidf_matrix.pkl'
-COSINE_SIM_PATH = 'cosine_sim_matrix.pkl'
+TFIDF_PATH = '/app/wine_recommender/tfidf_matrix.pkl'
+COSINE_SIM_PATH = '/app/wine_recommender/cosine_sim_matrix.pkl'
 
 # Load data
 file = 'https://raw.githubusercontent.com/cfortunska/wine-recommender/main/wine_final.csv'
@@ -24,24 +24,27 @@ def build_similarity_matrix():
     # Save the matrices to disk
     with open(TFIDF_PATH, 'wb') as f:
         pickle.dump(tfidf_matrix, f)
-
     with open(COSINE_SIM_PATH, 'wb') as f:
         pickle.dump(cosine_sim_matrix, f)
     
     return tfidf_matrix, cosine_sim_matrix
 
 # Check if pre-computed matrices exist
-if os.path.exists(TFIDF_PATH) and os.path.exists(COSINE_SIM_PATH):
-    with open(TFIDF_PATH, 'rb') as f:
-        tfidf_matrix = pickle.load(f)
+try:
+    if os.path.exists(TFIDF_PATH) and os.path.exists(COSINE_SIM_PATH):
+        with open(TFIDF_PATH, 'rb') as f:
+            tfidf_matrix = pickle.load(f)
 
-    with open(COSINE_SIM_PATH, 'rb') as f:
-        cosine_sim_matrix = pickle.load(f)
-    st.write("✅ Loaded pre-computed matrices successfully.")
-else:
-    st.write("⏳ Computing similarity matrix. This may take a while...")
+        with open(COSINE_SIM_PATH, 'rb') as f:
+            cosine_sim_matrix = pickle.load(f)
+        st.write("✅ Loaded pre-computed matrices successfully.")
+    else:
+        st.write("⏳ Computing similarity matrix. This may take a while...")
+        tfidf_matrix, cosine_sim_matrix = build_similarity_matrix()
+        st.write("✅ Computation complete and models saved successfully.")
+except Exception as e:
+    st.error(f"Error loading or saving matrices: {e}")
     tfidf_matrix, cosine_sim_matrix = build_similarity_matrix()
-    st.write("✅ Computation complete and models saved successfully.")
 
 # Function to search for best match
 def search_item(user_input, choices, threshold=80):
