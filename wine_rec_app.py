@@ -4,34 +4,10 @@ import streamlit as st
 from fuzzywuzzy import process
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-import requests
-from io import StringIO
 
-# Function to load data from Google Drive
-@st.cache_data
-def load_data(file_url):
-    try:
-        response = requests.get(file_url)
-        response.raise_for_status()
-        csv_data = StringIO(response.text)
-        data = pd.read_csv(csv_data)
-        return data
-    except Exception as e:
-        st.error(f"Error loading file: {e}")
-        return pd.DataFrame()  # Return empty DataFrame if loading fails
-
-# Load Data
-file_url = "https://drive.google.com/uc?export=download&id=13_2Y30Xz6AXgaemW70-UL6r5DBzlaZDD"
-df1 = load_data(file_url)
-
-if df1.empty:
-    st.error("Failed to load data. Please check the file URL or file accessibility.")
-    st.stop()
-
-# Ensure necessary columns exist
-if "title" not in df1.columns or "new_description" not in df1.columns:
-    st.error("The dataset must contain 'title' and 'new_description' columns.")
-    st.stop()
+# Load data
+file='https://github.com/cfortunska/wine-recommender/blob/main/wine_final.csv'
+pd.read_csv(file)
 
 # Build Recommendation System
 tfidf = TfidfVectorizer(stop_words='english')
