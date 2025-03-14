@@ -15,17 +15,8 @@ COSINE_SIM_PATH = 'cosine_sim_matrix.pkl'
 file = 'https://raw.githubusercontent.com/cfortunska/wine-recommender/main/wine_final.csv'
 df1 = pd.read_csv(file)
 
-# Check if pre-computed matrices exist
-if os.path.exists(TFIDF_PATH) and os.path.exists(COSINE_SIM_PATH):
-    with open(TFIDF_PATH, 'rb') as f:
-        tfidf_matrix = pickle.load(f)
-
-    with open(COSINE_SIM_PATH, 'rb') as f:
-        cosine_sim_matrix = pickle.load(f)
-    st.write("✅ Loaded pre-computed matrices successfully.")
-else:
-    # If not, compute and save them
-    st.write("⏳ Computing similarity matrix. This may take a while...")
+# Function to build similarity matrix
+def build_similarity_matrix():
     tfidf = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf.fit_transform(df1['new_description'].fillna(''))
     cosine_sim_matrix = linear_kernel(tfidf_matrix, tfidf_matrix)
@@ -37,6 +28,19 @@ else:
     with open(COSINE_SIM_PATH, 'wb') as f:
         pickle.dump(cosine_sim_matrix, f)
     
+    return tfidf_matrix, cosine_sim_matrix
+
+# Check if pre-computed matrices exist
+if os.path.exists(TFIDF_PATH) and os.path.exists(COSINE_SIM_PATH):
+    with open(TFIDF_PATH, 'rb') as f:
+        tfidf_matrix = pickle.load(f)
+
+    with open(COSINE_SIM_PATH, 'rb') as f:
+        cosine_sim_matrix = pickle.load(f)
+    st.write("✅ Loaded pre-computed matrices successfully.")
+else:
+    st.write("⏳ Computing similarity matrix. This may take a while...")
+    tfidf_matrix, cosine_sim_matrix = build_similarity_matrix()
     st.write("✅ Computation complete and models saved successfully.")
 
 # Function to search for best match
