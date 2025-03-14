@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 # Load data
-file='https://github.com/cfortunska/wine-recommender/blob/main/wine_final.csv'
+file='https://raw.githubusercontent.com/cfortunska/wine-recommender/main/wine_final.csv'
 df1=pd.read_csv(file)
 
 # Build Recommendation System
